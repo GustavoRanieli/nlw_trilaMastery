@@ -83,35 +83,26 @@ export function App() {
 
           <form className='space-y-6'>
 
-          <div className='space-y-2'>
+          <div className='space-y-2 flex flex-col'>
               <Label>
                 Prompt
               </Label>
 
-              <Select >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Theme" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Titulo">Titulo Youtube</SelectItem>
-                  <SelectItem value="Descrição">Descrição Youtube</SelectItem>
-                </SelectContent>
-              </Select>            
+              <select name="" className='form-select bg-black'>
+                <option value="" selected>Selecione o prompt desejado</option>
+                <option value="">Título do vídeo</option>
+                <option value="">Descrição do vídeo</option>
+              </select>           
             </div>
 
-            <div className='space-y-2'>
+            <div className='space-y-2 flex flex-col'>
               <Label>
                 Modelo
               </Label>
 
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Theme" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gpt3.5">GPT 3.5-turbo 16k</SelectItem>
-                </SelectContent>
-              </Select>
+              <select name="" className='bg-black form-select'>
+                <option value="gtp3.5" selected>GPT 3.5 16k</option>
+              </select>
 
               <span className='text-sm italic text-muted-foreground block'>Você poderá customizar essa opção em breve</span>              
             </div>
