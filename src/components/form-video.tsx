@@ -6,9 +6,22 @@ import { Button } from "./ui/button";
 import { ChangeEvent, FormEvent, useMemo, useRef, useState } from "react";
 import { getFFmpeg } from "@/lib/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
+import { api } from '../lib/axios'
+
+type Status = 'waiting' | 'converting' | 'transcription' | 'success';
+const statusMessage = {
+  'waiting': 'Aguardando...',
+  'converting': 'Convertendo...',
+  'transcription': 'Transcrevendo...',
+  'success': 'Sucesso!'
+}
+
 
 export function FormVideo(){
     const [video, setVideo] = useState<File | null>(null)
+    const [status, setStatus] = useState<Status>('waiting')
+
+
     const promptinputRef = useRef<HTMLTextAreaElement>(null)
 
 
@@ -49,13 +62,47 @@ export function FormVideo(){
             '-acodec',
             'libmp3lame',
             'output.mp3' 
-        ])
+        ]);
+
+        const data = await ffmpeg.readFile('output.mp3');
+
+        const audioFileBlob = new Blob([data], {type: 'audio/mpeg'});
+        const audioFile = new File([audioFileBlob], 'audio.mp3', {
+          type: 'audio/mpeg',
+        });
+
+        console.log('Convert Finished')
+
+        return audioFile
     }
 
-    function handleFormRef(form: FormEvent<HTMLFormElement>){
+    async function handleFormRef(form: FormEvent<HTMLFormElement>){
         event?.preventDefault();
 
-        const promp = promptinputRef.current?.value;
+        const prompt = promptinputRef.current?.value;
+
+        if(!video){
+          return
+        }
+
+        // Convertendo video - audio
+        setStatus('converting')
+        const audioFile = await convertAudio(video);
+
+
+        // Transcrevendo audio enviando para api
+        setStatus('transcription')
+        const data = new FormData();
+        data.append('file', audioFile);
+        const response = await api.post('/videos', data);
+        const videoId = response.data.video.id;
+
+
+        await api.post(`/videos/${videoId}transcription`, {
+          prompt,
+        })
+
+        setStatus('success')
     }
 
     const previewVideo = useMemo(() => {
@@ -98,9 +145,17 @@ export function FormVideo(){
               />
             </div>
 
-            <Button className='w-full' type='submit'>
-              Carregar Vídeo
-              <Upload className='w-4 h-4 ml-2'/>
+            <Button
+              disabled={status != 'waiting'}
+              data-success={status === 'success'}
+              className='w-full  data-[success=true]:bg-emerald-400'
+              type='submit'>
+              {status == 'waiting' ? (
+                <>
+                  Carregar Vídeo
+                  <Upload className='w-4 h-4 ml-2'/>
+                </>
+              ) : statusMessage[status]}
             </Button>
           </form>
     )

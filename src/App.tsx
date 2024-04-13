@@ -5,6 +5,7 @@ import { Textarea } from './components/ui/textarea';
 import { Label } from './components/ui/label';
 import { Slider } from './components/ui/slider';
 import { FormVideo } from './components/form-video';
+import { PromptsSelect } from './components/select-prompts';
 
 export function App() {
 
@@ -50,22 +51,11 @@ export function App() {
 
         <aside className='w-80 space-y-6'>
           <FormVideo />
-
           <Separator />
 
           <form className='space-y-6'>
 
-          <div className='space-y-2 flex flex-col'>
-              <Label>
-                Prompt
-              </Label>
-
-              <select name="" className='form-select bg-black'>
-                <option value="" selected>Selecione o prompt desejado</option>
-                <option value="">Título do vídeo</option>
-                <option value="">Descrição do vídeo</option>
-              </select>           
-            </div>
+            <PromptsSelect />
 
             <div className='space-y-2 flex flex-col'>
               <Label>
