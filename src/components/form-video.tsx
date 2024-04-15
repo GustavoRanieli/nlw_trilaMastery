@@ -17,7 +17,11 @@ const statusMessage = {
 }
 
 
-export function FormVideo(){
+interface PropsVideo {
+  onVideoId: (videoId: string) => void
+}
+
+export function FormVideo(Props: PropsVideo){
     const [video, setVideo] = useState<File | null>(null)
     const [status, setStatus] = useState<Status>('waiting')
 
@@ -103,6 +107,7 @@ export function FormVideo(){
         })
 
         setStatus('success')
+        Props.onVideoId(videoId)
     }
 
     const previewVideo = useMemo(() => {

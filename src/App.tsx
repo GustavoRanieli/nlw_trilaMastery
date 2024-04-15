@@ -6,8 +6,31 @@ import { Label } from './components/ui/label';
 import { Slider } from './components/ui/slider';
 import { FormVideo } from './components/form-video';
 import { PromptsSelect } from './components/select-prompts';
+import { useState } from 'react';
+import { useCompletion } from 'ai/react'
+
 
 export function App() {
+  const [ temperature, setTemperature ] = useState<number>(0.5);
+  const [ videoId, setVideo ] = useState<string | null >(null)
+
+  const {
+    input,
+    setInput,
+    isLoading,
+    handleInputChange,
+    handleSubmit,
+    completion
+  } = useCompletion({
+    api: 'http://localhost:3333/api/complete',
+    body: {
+      videoId,
+      temperature
+    },
+    headers: {
+      'Content-type': 'application/json'
+    }
+  })
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -36,11 +59,14 @@ export function App() {
               <Textarea 
                 className='p-4 leading-relaxed resize-none'
                 placeholder='Inclua o prompt para a IA...'
+                value={input}
+                onChange={handleInputChange}
               />
               <Textarea 
                 className='p-4 leading-relaxed resize-none'
                 placeholder='Resultado gerado pela IA...' 
                 readOnly
+                value={completion}
               />
           </div>
 
@@ -50,12 +76,12 @@ export function App() {
 
 
         <aside className='w-80 space-y-6'>
-          <FormVideo />
+          <FormVideo onVideoId={setVideo} />
           <Separator />
 
-          <form className='space-y-6'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
 
-            <PromptsSelect />
+            <PromptsSelect onSelectPrompt={setInput} />
 
             <div className='space-y-2 flex flex-col'>
               <Label>
@@ -80,6 +106,8 @@ export function App() {
                 min={0}
                 max={1}
                 step={0.5}
+                value={[temperature]}
+                onValueChange={value => setTemperature(value[0])}
               />
 
               <span className='text-sm italic text-muted-foreground block'>
@@ -89,7 +117,7 @@ export function App() {
 
             <Separator />
 
-            <Button type='submit' className='w-full'>
+            <Button disabled={isLoading == true} type='submit' className='w-full'>
                 Executar
                 <Wand2 className='w-4 h-4 ml-2' />
             </Button>
